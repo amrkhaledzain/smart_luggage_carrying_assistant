@@ -1,0 +1,11 @@
+# Python Cache Files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE and System Files
+.vscode/
+.idea/
+.DS_Store
+*.swp
