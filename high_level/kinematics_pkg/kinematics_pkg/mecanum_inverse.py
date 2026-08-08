@@ -16,7 +16,7 @@ class MecanumKinematics(Node):
     )
     # Publish wheel speeds array [v1, v2, v3, v4]
     self.publisher = self.create_publisher(
-        Float32MultiArray, '/wheel_speeds', 10
+        Float32MultiArray, '/wheel_setpoints', 10
     )
 
     # Robot Physical Dimensions (in meters)
