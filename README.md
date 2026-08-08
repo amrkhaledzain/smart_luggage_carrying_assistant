@@ -131,6 +131,16 @@ smart_luggage_carrying_assistant/
         ├── PID.cpp/.hpp                     # Discrete PID with anti-windup clamping
         ├── Timer_class.cpp/.h               # High-resolution hardware timer wrapper
         └── timer_peripherals.cpp            # MCU-specific register configurations
+```
+
 ---
 
 ##🚀 Installation & Bringup
+
+#1. ROS 2 Workspace Setup
+```text
+cd ~/ieee_ws
+rosdep update && rosdep install --from-paths src --ignore-src -y
+colcon build --symlink-install
+source install/setup.bash
+```
