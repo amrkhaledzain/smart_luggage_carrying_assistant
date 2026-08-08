@@ -131,3 +131,6 @@ smart_luggage_carrying_assistant/
         ├── PID.cpp/.hpp                     # Discrete PID with anti-windup clamping
         ├── Timer_class.cpp/.h               # High-resolution hardware timer wrapper
         └── timer_peripherals.cpp            # MCU-specific register configurations
+---
+
+##🚀 Installation & Bringup
