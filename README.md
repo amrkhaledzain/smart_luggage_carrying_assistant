@@ -135,12 +135,28 @@ smart_luggage_carrying_assistant/
 
 ---
 
-##   Installation & Bringup
+## 🚀Installation & Bringup
 
 ### 1. ROS 2 Workspace Setup
+
 ```text
-cd ~/ieee_ws
-rosdep update && rosdep install --from-paths src --ignore-src -y
-colcon build --symlink-install
-source install/setup.bash
+  cd ~/ieee_ws
+  rosdep update && rosdep install --from-paths src --ignore-src -y
+  colcon build --symlink-install
+  source install/setup.bash
+```
+
+### 2. Flashing the Firmware
+
+-Open the low_level/movement directory in your preferred IDE (Arduino IDE / PlatformIO).
+-Ensure the micro-ROS client library is installed for your specific board.
+-Compile and flash the code to the microcontroller.
+
+### 3. Running the System
+
+Terminal : Launch the High-Level Intelligence
+(Starts the camera, vision pipelines, tracking algorithms, and kinematics).
+
+```text
+    ros2 launch bringup_pkg robot_bringup.launch.py target_id:=0
 ```
