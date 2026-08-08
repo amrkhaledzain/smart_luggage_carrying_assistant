@@ -101,7 +101,7 @@ The `high_level` directory contains modular, decoupled ROS 2 packages:
 
 The `low_level` directory contains the robust C++ firmware designed for the microcontroller, bridging micro-ROS with bare-metal hardware peripherals.
 
-* **micro-ROS Executor (`movement.ino`):** Initializes the ROS 2 node natively on the MCU. Handles WiFi/Serial transport, topic subscriptions, and the main non-blocking control loop.
+* **micro-ROS Executor (`movement.ino`):** Initializes the ROS 2 node natively on the MCU. Handles Serial transport, topic subscriptions, and the main non-blocking control loop.
 * **Hardware Timers (`Timer_class` & `timer_peripherals`):** Configures MCU hardware registers to generate precise interrupts for the PID loops and RPM calculations, independent of the main CPU loop.
 * **Quadrature Encoders (`encoder`):** Utilizes external hardware interrupts (RISING/FALLING edges) on Channel A and B to determine direction and accumulate tick counts with zero pulse loss.
 * **Motor Drivers (`CYTRON_MDD10A` & `L298N`):** Object-oriented abstractions. The system supports heavy-duty Cytron drivers (Sign-Magnitude PWM) for high-torque applications, and L298N (Locked-Antiphase/Dual-Pin) for development testing, all inheriting from a generic `dc_motor` interface.
