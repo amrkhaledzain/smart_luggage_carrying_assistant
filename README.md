@@ -60,8 +60,9 @@ The system employs a **Cascaded Control Loop** strategy:
 
 ### 1. Outer Loop (Spatial Tracking - ROS 2)
 Located in `pid_follower_node.cpp`. This loop regulates the spatial distance and angle between the robot and the human target.
-* **Distance Error:** $e_d = \text{Target\_Distance} - \text{Measured\_Distance\_Z}$
-* **Angle Error:** $e_\theta = 0 - \text{Measured\_Angle\_X}$
+
+* **Distance Error:** $e_d = \text{Target Distance} - \text{Measured Distance}_Z$
+* **Angle Error:** $e_\theta = 0 - \text{Measured Angle}_X$
 * **Output:** $V_x$ (Linear Velocity) and $\omega_z$ (Angular Velocity).
 
 ### 2. Inner Loop (Motor Velocity - micro-ROS/MCU)
