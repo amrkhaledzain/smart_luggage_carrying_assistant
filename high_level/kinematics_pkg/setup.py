@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'mecanum_inverse_node = kinematics_pkg.mecanum_inverse:main',
+            'mecanum_forward_node = kinematics_pkg.mecanum_forward:main',
         ],
     },
 )

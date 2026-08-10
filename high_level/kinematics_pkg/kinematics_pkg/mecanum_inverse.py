@@ -6,10 +6,10 @@ from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
 
 
-class MecanumKinematics(Node):
+class MecanumKinematics_inverse(Node):
 
   def __init__(self):
-    super().__init__('mecanum_kinematics')
+    super().__init__('mecanum_kinematics_inverse')
     # Subscribe to target velocity (/cmd_vel)
     self.subscription = self.create_subscription(
         Twist, '/cmd_vel', self.cmd_vel_callback, 10
@@ -44,7 +44,7 @@ class MecanumKinematics(Node):
 
 def main(args=None):
   rclpy.init(args=args)
-  kinematics_node = MecanumKinematics()
+  kinematics_node = MecanumKinematics_inverse()
 
   try:
     rclpy.spin(kinematics_node)

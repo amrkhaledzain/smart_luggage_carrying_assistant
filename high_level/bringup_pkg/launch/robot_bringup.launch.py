@@ -62,6 +62,18 @@ def generate_launch_description():
       ],
       output='screen',
   )
+  trasform_serial_arduino = Node(
+        package='trans_arduino_serial',
+        executable='trans_arduino_serial',
+        name='trans_arduino_serial',
+        output='screen',    
+  )
+  odom_node = Node(
+        package='kinematics_pkg',
+        executable='mecanum_forward_node',
+        name='mecanum_forward_node',
+        output='screen',
+    )
 
   return LaunchDescription([
       target_id_arg,
@@ -70,4 +82,6 @@ def generate_launch_description():
       target_tracker_node,
       mecanum_inverse_node,
       micro_ros_agent,
+      # trasform_serial_arduino,
+      odom_node,
   ])
