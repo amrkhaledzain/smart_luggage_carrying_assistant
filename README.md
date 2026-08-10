@@ -177,7 +177,7 @@ Terminal : Launch the High-Level Intelligence
     ros2 launch bringup_pkg robot_bringup.launch.py target_id:=0
 ```
 
-###L aunch Serial Bridge to Hardware
+### Launch Serial Bridge to Hardware
 
 ```text
 ros2 run trans_arduino_serial trans_arduino_serial
