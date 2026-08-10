@@ -113,25 +113,40 @@ The `low_level` directory contains the robust C++ firmware designed for the micr
 ```text
 smart_luggage_carrying_assistant/
 │
-├── high_level/                              # ROS 2 Processing Layer (Ubuntu)
-│   ├── vision_pkg/                          # OpenCV ArUco detection & PnP pose estimation
-│   ├── tracking_pkg/                        # Spatial PID following & target locking
-│   ├── kinematics_pkg/                      # Mecanum inverse kinematics matrix solver
-│   └── bringup_pkg/                         # Launch files and params.yaml
+├── high_level/                               # ROS 2 Processing Layer (Ubuntu)
+│   ├── vision_pkg/                           # OpenCV ArUco detection & PnP pose estimation
+│   ├── tracking_pkg/                         # Spatial PID following & target locking
+│   ├── kinematics_pkg/                       # Mecanum inverse kinematics matrix solver
+│   ├── trans_arduino_serial/                 # Serial bridge node (Subscribes to wheel setpoints & sends to Serial)
+│   └── bringup_pkg/                          # Launch files and params.yaml
 │
-└── low_level/                               # Embedded Firmware (MCU)
-    ├── peripherals/                         
-    │   └── ultrasonic_sensor.cpp/.hpp       # Obstacle overriding (safety layer)
-    └── movement/                            
-        ├── movement.ino                     # micro-ROS node & main execution loop
-        ├── pin_config.hpp                   # Centralized GPIO & Timer hardware mapping
-        ├── dc_motor.hpp                     # Abstract Base Class for motor drivers
-        ├── CYTRON_MDD10A.cpp/.hpp           # Cytron MDD10A driver implementation
-        ├── L298N.cpp/.hpp                   # L298N H-Bridge driver implementation
-        ├── encoder.cpp/.h                   # Hardware interrupt encoder pulse counting
-        ├── PID.cpp/.hpp                     # Discrete PID with anti-windup clamping
-        ├── Timer_class.cpp/.h               # High-resolution hardware timer wrapper
-        └── timer_peripherals.cpp            # MCU-specific register configurations
+└── low-level/                                # Embedded Firmware (MCU)
+    ├── arduino_code/                         # Simple Arduino Uno/Nano implementation
+    │   ├── arduino_code.ino                  # Serial receiver & direct L298N drive loop
+    │   ├── L298N.cpp/.hpp                    # L298N H-Bridge driver
+    │   └── dc_motor.hpp                      # Abstract Base Class for motor drivers
+    │
+    └── stm32_blackpill/                      # STM32 F401 Firmware implementations
+        ├── PeripheralPins_BLACKPILL_F401Cx.c # STM32 pinout register definitions
+        ├── no_pid_movement/                  # Open-loop control pipeline (No feedback)
+        │   ├── no_pid_movement.ino
+        │   ├── L298N.cpp/.hpp
+        │   ├── PID.cpp/.hpp
+        │   ├── Timer_class.cpp/.h
+        │   ├── dc_motor.hpp
+        │   ├── encoder.cpp/.h
+        │   ├── pin_confg.hpp
+        │   └── wheels.cpp/.hpp
+        │
+        └── pid_movement/                     # Closed-loop control pipeline (Encoder PID control)
+            ├── pid_movement.ino
+            ├── L298N.cpp/.hpp
+            ├── PID.cpp/.hpp
+            ├── Timer_class.cpp/.h
+            ├── dc_motor.hpp
+            ├── encoder.cpp/.h
+            ├── pin_confg.hpp
+            └── wheels.cpp/.hpp
 ```
 
 ---
@@ -160,4 +175,10 @@ Terminal : Launch the High-Level Intelligence
 
 ```text
     ros2 launch bringup_pkg robot_bringup.launch.py target_id:=0
+```
+
+###Launch Serial Bridge to Hardware
+
+```text
+ros2 run trans_arduino_serial trans_arduino_serial
 ```
