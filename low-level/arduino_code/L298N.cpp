@@ -18,11 +18,12 @@
         digitalWrite(Pin2, LOW);
         analogWrite(ENA, Speed); 
       }
-      else {
+      else if (Speed < 0){
         digitalWrite(Pin1, LOW);
         digitalWrite(Pin2, HIGH);
         analogWrite(ENA, -Speed); 
       }
+      else Stop();
 
     };
     void L298N::Stop() {

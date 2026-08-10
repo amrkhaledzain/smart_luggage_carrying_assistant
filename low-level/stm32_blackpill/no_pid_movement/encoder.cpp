@@ -2,7 +2,7 @@
 
 //constructor 
 Encoder::Encoder(timer& t, uint32_t resolution, float circum)
-    : hwTimer(t), last_count(0), rps(0.0), 
+    : hwTimer(t), last_count(0), rps(0), 
     resolution(resolution), wheel_circum(circum),last_time(0) {
     }
 
@@ -14,7 +14,7 @@ uint32_t Encoder::get_count() {
 //resets calculation values
 void Encoder::reset() {
     last_count = 0;
-    rps = 0.0;
+    rps = 0;
 }
 
 //returns direction depending on speed_ticks , different between counts
@@ -25,9 +25,9 @@ int Encoder::get_direction() {
 }
 
 //updating speed
-void Encoder::update_speed(double dt_ms) {
-    // uint32_t current_time = millis();
-    // uint32_t dt_ms = current_time - last_time; //calculate time_diff
+void Encoder::update_speed() {
+    uint32_t current_time = millis();
+    uint32_t dt_ms = current_time - last_time; //calculate time_diff
 
     //to avoid overflow , redundant readings 
     if (dt_ms < TIME_THRESHOLD) return ; 
@@ -42,14 +42,12 @@ void Encoder::update_speed(double dt_ms) {
     if (count_difference < -MAX_COUNT)  count_difference += UNSIGNED_MAX_COUNT;
 
     //counts per second
-    rps = count_difference * 1000.0 / (double)dt_ms  ;
-    if (resolution == 0) rps = 0;
-    rps = rps /resolution;
-
+    //rps = ((count_difference / (int32_t)dt_ms) * (1000 / resolution));
+    rps = count_difference * 1000 / (int32_t)dt_ms  ;
 
     //updating values for next calculation 
     last_count = current_count;
-    // last_time = current_time ;
+    last_time = current_time ;
 }
 
 //last speed in ticks/sec
@@ -59,7 +57,8 @@ int32_t Encoder::get_rps() {
 
 //Converting to RPM
 float Encoder::get_speed_rpm() {
-    return (rps * 60.0);
+    if (resolution == 0) return 0;
+    return (rps * 60) / resolution;
 }
 
 // rps = ((counts / 00000000000000000000000000000000000000000000000 ) * 1 / cpr ) 
@@ -70,3 +69,4 @@ float Encoder::get_linear_speed() {
     if (resolution == 0) return 0;
     return (rps / (float)resolution) * wheel_circum;
 }
+

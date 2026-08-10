@@ -15,7 +15,7 @@ class Encoder
   private:
     timer& hwTimer ;         //reference to hardware timer
     uint32_t last_count;     //last encoder count
-    double rps ;    //rps
+    float rps ;    //rps
     uint32_t resolution;  //encoder resolution
     float wheel_circum;       //for linear speed and distance
     uint32_t last_time ;
@@ -27,7 +27,7 @@ class Encoder
 
     uint32_t get_count();
     float get_speed_rpm() ;
-    void update_speed(double dt_ms);
+    void update_speed();
 
     //calculation methods
     int32_t get_rps() ;
