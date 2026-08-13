@@ -23,6 +23,7 @@ class TargetTrackerNode(Node):
     self.create_subscription(
         Point, '/aruco/target_pose', self.pose_callback, 10
     )
+
     self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
 
     # State Machine Variables
@@ -32,7 +33,9 @@ class TargetTrackerNode(Node):
     )
     self.search_start_yaw = 0.0
     self.sweep_angle = math.radians(45.0)  # 45 degrees = 0.785 rad
-    self.search_angular_speed = 0.3  # rad/s
+    self.search_angular_speed = 14.0  # rad/s
+
+    self.no_target_count=0
 
     self.get_logger().info('Target Tracker Node with Fixed Sweep Search Started!')
 
@@ -49,15 +52,16 @@ class TargetTrackerNode(Node):
     z_m = msg.z
     status = msg.y
 
-    if status == 1.0:  # Target Found
+    if status == 1.0 : # Target Found
       self.search_state = 'TRACKING'
 
+      self.no_target_count=0
       # Distance control
       depth_error = z_m - self.stop_distance
       if depth_error > 0.05:
-        cmd.linear.x = min(0.4, depth_error * 0.6)
+        cmd.linear.x = ( depth_error * 10)
       elif depth_error < -0.10:
-        cmd.linear.x = max(-0.2, depth_error * 0.4)
+        cmd.linear.x = ( depth_error * 4)
       else:
         cmd.linear.x = 0.0
 
@@ -67,39 +71,41 @@ class TargetTrackerNode(Node):
         cmd.angular.z = -x_m * 0.8
 
     else:  # Target Lost -> Execute 45-degree Sweep Search
-      if self.search_state == 'TRACKING':
-        self.search_state = 'SWEEP_RIGHT'
-        self.search_start_yaw = self.current_yaw
-        self.get_logger().info('Target lost! Starting right sweep...')
+      self.no_target_count +=1
+      if self.no_target_count >= 50:
+        if self.search_state == 'TRACKING':
+          self.search_state = 'SWEEP_RIGHT'
+          self.search_start_yaw = self.current_yaw
+          self.get_logger().info('Target lost! Starting right sweep...')
 
-      # Relative angle from initial heading: Positive = Left, Negative = Right
-      rel_yaw = self.normalize_angle(self.current_yaw - self.search_start_yaw)
+        # Relative angle from initial heading: Positive = Left, Negative = Right
+        rel_yaw = self.normalize_angle(self.current_yaw - self.search_start_yaw)
 
-      if self.search_state == 'SWEEP_RIGHT':
-        # Turn right until angle reaches -45 degrees (-0.785 rad)
-        if rel_yaw > -self.sweep_angle:
-          cmd.angular.z = -self.search_angular_speed  # Negative = Clockwise (Right)
-        else:
-          self.search_state = 'SWEEP_LEFT'
-          self.get_logger().info('Reached -45°. Sweeping left to +45°...')
+        if self.search_state == 'SWEEP_RIGHT':
+          # Turn right until angle reaches -45 degrees (-0.785 rad)
+          if rel_yaw > -self.sweep_angle:
+            cmd.angular.z = -self.search_angular_speed  # Negative = Clockwise (Right)
+          else:
+            self.search_state = 'SWEEP_LEFT'
+            self.get_logger().info('Reached -45°. Sweeping left to +45°...')
 
-      elif self.search_state == 'SWEEP_LEFT':
-        # Turn left until angle reaches +45 degrees (+0.785 rad)
-        if rel_yaw < self.sweep_angle:
-          cmd.angular.z = self.search_angular_speed  # Positive = Counter-Clockwise (Left)
-        else:
-          self.search_state = 'RETURN_CENTER'
-          self.get_logger().info('Reached +45°. Returning to center...')
+        elif self.search_state == 'SWEEP_LEFT':
+          # Turn left until angle reaches +45 degrees (+0.785 rad)
+          if rel_yaw < self.sweep_angle:
+            cmd.angular.z = self.search_angular_speed  # Positive = Counter-Clockwise (Left)
+          else:
+            self.search_state = 'RETURN_CENTER'
+            self.get_logger().info('Reached +45°. Returning to center...')
 
-      elif self.search_state == 'RETURN_CENTER':
-        # Return to 0 relative heading
-        if rel_yaw > 0.05:
-          cmd.angular.z = -self.search_angular_speed
-        elif rel_yaw < -0.05:
-          cmd.angular.z = self.search_angular_speed
-        else:
-          cmd.angular.z = 0.0
-          self.search_state = 'SWEEP_RIGHT'  # Restart sweep cycle if still lost
+        elif self.search_state == 'RETURN_CENTER':
+          # Return to 0 relative heading
+          if rel_yaw > 0.05:
+            cmd.angular.z = -self.search_angular_speed
+          elif rel_yaw < -0.05:
+            cmd.angular.z = self.search_angular_speed
+          else:
+            cmd.angular.z = 0.0
+            self.search_state = 'SWEEP_RIGHT'  # Restart sweep cycle if still lost
 
     self.cmd_vel_pub.publish(cmd)
 

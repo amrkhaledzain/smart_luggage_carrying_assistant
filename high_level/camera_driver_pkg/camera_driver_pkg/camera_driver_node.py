@@ -12,7 +12,7 @@ class CameraDriverNode(Node):
   def __init__(self):
     super().__init__('camera_driver_node')
     self.publisher_ = self.create_publisher(Image, '/camera/image_raw', 10)
-    self.cap = cv2.VideoCapture(0)
+    self.cap = cv2.VideoCapture(1)
     self.timer = self.create_timer(0.033, self.timer_callback)
     self.get_logger().info('Camera Driver Node Started!')
 

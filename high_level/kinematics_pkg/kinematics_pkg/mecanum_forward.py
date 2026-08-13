@@ -28,7 +28,7 @@ class MecanumKinematicsForward(Node):
     self.last_time = self.get_clock().now()
 
     self.subscription = self.create_subscription(
-        Float32MultiArray, '/wheel_setpoints', self.wheel_callback, 10
+        Float32MultiArray, '/encoder_speed', self.wheel_callback, 10
     )
     self.publisher = self.create_publisher(Odometry, '/odom', 10)
 
