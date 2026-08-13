@@ -35,7 +35,8 @@ class TargetTrackerNode(Node):
     self.sweep_angle = math.radians(45.0)  # 45 degrees = 0.785 rad
     self.search_angular_speed = 14.0  # rad/s
 
-    self.no_target_count=0
+    self.no_target_count=0.0
+    self.target_found_count=0.0
 
     self.get_logger().info('Target Tracker Node with Fixed Sweep Search Started!')
 
@@ -56,23 +57,24 @@ class TargetTrackerNode(Node):
       self.search_state = 'TRACKING'
 
       self.no_target_count=0
+      self.target_found_count=0
       # Distance control
       depth_error = z_m - self.stop_distance
-      if depth_error > 0.05:
+      if depth_error > 0.15:
         cmd.linear.x = ( depth_error * 10)
-      elif depth_error < -0.10:
+      elif depth_error < -0.15:
         cmd.linear.x = ( depth_error * 4)
       else:
         cmd.linear.x = 0.0
 
       # Lateral and angular adjustment
-      if abs(x_m) > 0.1:
-        cmd.linear.y = -x_m * 1.2
-        cmd.angular.z = -x_m * 0.8
+      if abs(x_m) > 0.2:
+        cmd.linear.y = -x_m * 60
+        cmd.angular.z = -x_m * 50
 
     else:  # Target Lost -> Execute 45-degree Sweep Search
       self.no_target_count +=1
-      if self.no_target_count >= 50:
+      if self.no_target_count >= 50 and self.target_found_count <=3:
         if self.search_state == 'TRACKING':
           self.search_state = 'SWEEP_RIGHT'
           self.search_start_yaw = self.current_yaw
@@ -104,9 +106,16 @@ class TargetTrackerNode(Node):
           elif rel_yaw < -0.05:
             cmd.angular.z = self.search_angular_speed
           else:
+            self.target_found_count +=1
             cmd.angular.z = 0.0
             self.search_state = 'SWEEP_RIGHT'  # Restart sweep cycle if still lost
 
+        print(f"----{self.target_found_count}\n----")
+      elif self.no_target_count >= 3:
+        cmd.linear.x = 0.0
+        cmd.linear.y = 0.0
+        cmd.angular.z= 0.0
+        
     self.cmd_vel_pub.publish(cmd)
 
   @staticmethod

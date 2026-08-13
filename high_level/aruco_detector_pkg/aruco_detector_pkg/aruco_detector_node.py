@@ -31,7 +31,7 @@ class ArucoDetectorNode(Node):
 
     # 5. Constants
     self.focal_length = 600.0
-    self.marker_real_width = 0.10  # 10 cm
+    self.marker_real_width = 0.20  # 10 cm
 
     self.get_logger().info('ArUco Detector Node Started!')
 
